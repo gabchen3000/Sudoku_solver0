@@ -25,7 +25,8 @@ initial_state = [[7, 6, 0, 0, 0, 9, 0, 4, 2],
 # The following code only solves the Sudoku, it assumes the given puzzle only has one unique solution
 # Step 1: Go to each "0" entry and fill in the ones that has only one possible value
 # Step 2: Go to each remaining "0" entry and fill in all possible values for that box
-# Step 3:
+# Step 3: Check out each row, col, grid and check for single numbers. For example: row 1: only one entry has the
+#         possibility for 6, that entry is 6.
 def list_possible_values(rows, cols, prev_stage):
     possible_values = [i for i in range(1, 10)]
     rowVals = []
@@ -133,7 +134,6 @@ After quad
 [5, 4, [3, 8, 9], 6, [2, 3, 8, 9], [3, 8], [2, 3, 8, 9], 7, 1]
 '''
 
-
 def capture_single_values(stage_one):
     for rows in range(9):
         for cols in range(9):
@@ -151,6 +151,33 @@ def eliminate_zeroes(stage_two, stage_one):
                 stage_two[rows][cols] = list_possible_values(rows, cols, stage_one)
     return stage_two
 
+def find_single_in_groups(stage_three):
+    #stage_three = find_single_row(stage_three)
+    stage_three = find_single_col(stage_three)
+    #stage_three = find_single_grid(stage_three)
+
+
+def find_single_row(cur_stage):
+    for i in cur_stage:
+        current_row = []
+        occurence = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for entry in i:
+            if type(entry) is list:
+                for x in entry:
+                    occurence[int(x) - 1] += 1
+        print(occurence)
+
+def find_single_col(cur_stage):
+    for i in cur_stage:
+        current_col = []
+        occurence = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for entry in i:
+            if type(entry) is list:
+                for x in entry:
+                    occurence[int(x) - 1] += 1
+        print(occurence)
+
+
 def main():
     # STEP 1
     stage_one = initial_state.copy()
@@ -162,7 +189,10 @@ def main():
     # STEP 2
     stage_two = stage_one.copy()
     stage_two = eliminate_zeroes(stage_two, stage_one)
-
+    # END OF STEP 2
+    # STEP 3
+    stage_three = stage_two.copy()
+    stage_three = find_single_in_groups(stage_three)
     for i in stage_two:
         print(i)
 
