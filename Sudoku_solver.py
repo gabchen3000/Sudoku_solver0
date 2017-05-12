@@ -152,20 +152,65 @@ def eliminate_zeroes(stage_two, stage_one):
     return stage_two
 
 def find_single_in_groups(stage_three):
-    #stage_three = find_single_row(stage_three)
-    stage_three = find_single_col(stage_three)
+    stage_three = find_single_row(stage_three)
+    #stage_three = find_single_col(stage_three)
     #stage_three = find_single_grid(stage_three)
+    return stage_three
+
+
+'''
+End of stage 2:
+[7, 6, [1, 3, 5, 8], [1, 3, 5, 8], [3, 5, 8], 9, [3, 5, 8], 4, 2]
+[4, [3, 8, 9], [1, 3, 5, 8, 9], [1, 3, 5, 8], [3, 5, 6, 7, 8], 2, [3, 5, 7, 8], [1, 5, 8], [3, 5, 7, 8]]
+[[1, 3], [2, 3, 8], [1, 2, 3, 5, 8], [1, 3, 4, 5, 8], [3, 4, 5, 7, 8], [1, 3, 4, 5, 8], 6, [1, 5, 8], 9]
+[[3, 9], [3, 7, 9], [3, 7, 9], 2, [3, 4, 5, 8], [3, 4, 5, 8], 1, 6, [4, 5, 7, 8]]
+[8, 5, [2, 7], 9, 1, 6, [2, 4, 7], 3, [4, 7]]
+[[3, 6, 9], 1, 4, [3, 5, 8], [3, 5, 8], 7, [2, 5, 8, 9], [2, 5, 8, 9], [5, 8]]
+[2, [3, 7, 8, 9], 6, [1, 3, 4, 5, 8], [3, 4, 5, 8, 9], [1, 3, 4, 5, 8], [3, 4, 5, 8, 9], [5, 8, 9], [3, 4, 5, 7, 8]]
+[[1, 3, 9], [3, 8, 9], [1, 3, 8, 9], 7, [2, 3, 4, 5, 8, 9], [1, 3, 4, 5, 8], [2, 3, 4, 5, 8, 9], [2, 5, 8, 9], 6]
+[5, 4, [3, 8, 9], 6, [2, 3, 8, 9], [3, 8], [2, 3, 8, 9], 7, 1]
+
+After find single row:
+[7, 6, [1, 3, 5, 8], [1, 3, 5, 8], [3, 5, 8], 9, [3, 5, 8], 4, 2]
+[4, [3, 8, 9], [1, 3, 5, 8, 9], [1, 3, 5, 8], 6, 2, [3, 5, 7, 8], [1, 5, 8], [3, 5, 7, 8]]
+[[1, 3], [2, 3, 8], [1, 2, 3, 5, 8], [1, 3, 4, 5, 8], 7, [1, 3, 4, 5, 8], 6, [1, 5, 8], 9]
+[[3, 9], [3, 7, 9], [3, 7, 9], 2, [3, 4, 5, 8], [3, 4, 5, 8], 1, 6, [4, 5, 7, 8]]
+[8, 5, [2, 7], 9, 1, 6, [2, 4, 7], 3, [4, 7]]
+[6, 1, 4, [3, 5, 8], [3, 5, 8], 7, [2, 5, 8, 9], [2, 5, 8, 9], [5, 8]]
+[2, [3, 7, 8, 9], 6, [1, 3, 4, 5, 8], [3, 4, 5, 8, 9], [1, 3, 4, 5, 8], [3, 4, 5, 8, 9], [5, 8, 9], [3, 4, 5, 7, 8]]
+[[1, 3, 9], [3, 8, 9], [1, 3, 8, 9], 7, [2, 3, 4, 5, 8, 9], [1, 3, 4, 5, 8], [2, 3, 4, 5, 8, 9], [2, 5, 8, 9], 6]
+[5, 4, [3, 8, 9], 6, [2, 3, 8, 9], [3, 8], [2, 3, 8, 9], 7, 1]
+
+'''
 
 
 def find_single_row(cur_stage):
-    for i in cur_stage:
+    returnlist = []
+    for row_num, i in enumerate(cur_stage):
         current_row = []
         occurence = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         for entry in i:
             if type(entry) is list:
                 for x in entry:
                     occurence[int(x) - 1] += 1
-        print(occurence)
+        singled_value = []
+        for value, occur in enumerate(occurence):
+            if occur == 1:
+                singled_value.append(value+1)
+
+        for replace in singled_value:
+            for index, entries in enumerate(cur_stage[row_num]):
+                if type(entries) is list:
+                    if replace in entries:
+                        current_row.append(replace)
+                    else:
+                        current_row.append(entries)
+                else:
+                    current_row.append(entries)
+        if len(singled_value) == 0:
+            current_row = i
+        returnlist.append(current_row)
+    return returnlist
 
 def find_single_col(cur_stage):
     for i in cur_stage:
@@ -175,7 +220,6 @@ def find_single_col(cur_stage):
             if type(entry) is list:
                 for x in entry:
                     occurence[int(x) - 1] += 1
-        print(occurence)
 
 
 def main():
@@ -193,8 +237,10 @@ def main():
     # STEP 3
     stage_three = stage_two.copy()
     stage_three = find_single_in_groups(stage_three)
-    for i in stage_two:
+    for i in stage_three:
         print(i)
+
+
 
 if __name__ == "__main__":
     main()
