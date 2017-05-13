@@ -152,9 +152,9 @@ def eliminate_zeroes(stage_two, stage_one):
     return stage_two
 
 def find_single_in_groups(stage_three):
-    stage_three = find_single_row(stage_three)
-    #stage_three = find_single_col(stage_three)
-    #stage_three = find_single_grid(stage_three)
+    stage_three = look_for_single(stage_three)
+    stage_three = find_single_col(stage_three)
+    stage_three = find_single_grid(stage_three)
     return stage_three
 
 
@@ -184,7 +184,7 @@ After find single row:
 '''
 
 
-def find_single_row(cur_stage):
+def look_for_single(cur_stage):
     returnlist = []
     for row_num, i in enumerate(cur_stage):
         current_row = []
@@ -212,15 +212,62 @@ def find_single_row(cur_stage):
         returnlist.append(current_row)
     return returnlist
 
-def find_single_col(cur_stage):
-    for i in cur_stage:
-        current_col = []
-        occurence = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        for entry in i:
-            if type(entry) is list:
-                for x in entry:
-                    occurence[int(x) - 1] += 1
+def rows_to_col(matrix):
+    transpose_matrix = []
+    for i in range(9):
+        new_col = []
+        for x in matrix:
+            new_col.append(x[i])
+        transpose_matrix.append(new_col)
+    return transpose_matrix
 
+def find_single_col(cur_stage):
+    cur_stage = rows_to_col(cur_stage)
+    returnlist = look_for_single(cur_stage)
+    returnlist = eliminate_duplicates(returnlist)
+    return returnlist
+
+def eliminate_duplicates(matrix):
+    returnlist = []
+    for i in matrix:
+        row = []
+        exist_values = []
+        for x in i:
+            if type(x) == int:
+                exist_values.append(x)
+        for x in i:
+            if type(x) == list:
+                possible_values = []
+                for possible in x:
+                    if possible not in exist_values:
+                        possible_values.append(possible)
+                row.append(possible_values)
+            else:
+                row.append(x)
+        returnlist.append(row)
+    return returnlist
+
+def find_single_grid(cur_stage):
+    grid_into_rows = []
+    for k in range(3):
+        for l in range(3):
+            rows = []
+            for i in range(3):
+                for j in range(3):
+                    rows.append(cur_stage[j+3*l][i+3*k])
+            grid_into_rows.append(rows)
+    grid_into_rows = eliminate_duplicates(grid_into_rows)
+    grid_into_rows = look_for_single(grid_into_rows)
+    returnlist = []
+    for k in range(3):
+        for l in range(3):
+            row = []
+            for i in range(3):
+                for j in range(3):
+                    row.append(grid_into_rows[i+3*k][j+3*l])
+            returnlist.append(row)
+    returnlist = eliminate_duplicates(returnlist)
+    return returnlist
 
 def main():
     # STEP 1
