@@ -27,6 +27,7 @@ initial_state = [[7, 6, 0, 0, 0, 9, 0, 4, 2],
 # Step 2: Go to each remaining "0" entry and fill in all possible values for that box
 # Step 3: Check out each row, col, grid and check for single numbers. For example: row 1: only one entry has the
 #         possibility for 6, that entry is 6.
+# Step 4: Update each spot's possible values then repeat step 3 until no value is changed
 def list_possible_values(rows, cols, prev_stage):
     possible_values = [i for i in range(1, 10)]
     rowVals = []
@@ -193,6 +194,8 @@ def look_for_single(cur_stage):
             if type(entry) is list:
                 for x in entry:
                     occurence[int(x) - 1] += 1
+            else:
+                occurence[int(entry) - 1] = 10
         singled_value = []
         for value, occur in enumerate(occurence):
             if occur == 1:
@@ -210,6 +213,7 @@ def look_for_single(cur_stage):
         if len(singled_value) == 0:
             current_row = i
         returnlist.append(current_row)
+    returnlist = eliminate_duplicates(returnlist)
     return returnlist
 
 def rows_to_col(matrix):
@@ -224,7 +228,7 @@ def rows_to_col(matrix):
 def find_single_col(cur_stage):
     cur_stage = rows_to_col(cur_stage)
     returnlist = look_for_single(cur_stage)
-    returnlist = eliminate_duplicates(returnlist)
+    returnlist = rows_to_col(returnlist)
     return returnlist
 
 def eliminate_duplicates(matrix):
@@ -254,7 +258,7 @@ def find_single_grid(cur_stage):
             rows = []
             for i in range(3):
                 for j in range(3):
-                    rows.append(cur_stage[j+3*l][i+3*k])
+                    rows.append(cur_stage[j+3*k][i+3*l])
             grid_into_rows.append(rows)
     grid_into_rows = eliminate_duplicates(grid_into_rows)
     grid_into_rows = look_for_single(grid_into_rows)
@@ -264,7 +268,7 @@ def find_single_grid(cur_stage):
             row = []
             for i in range(3):
                 for j in range(3):
-                    row.append(grid_into_rows[i+3*k][j+3*l])
+                    row.append(grid_into_rows[i+k*3][l+3*j])
             returnlist.append(row)
     returnlist = eliminate_duplicates(returnlist)
     return returnlist
@@ -283,11 +287,28 @@ def main():
     # END OF STEP 2
     # STEP 3
     stage_three = stage_two.copy()
-    stage_three = find_single_in_groups(stage_three)
+    change = 1
+    while change == 1:
+        stage_three_check = find_single_in_groups(stage_three)
+        if stage_three != stage_three_check:
+            change = 1
+            stage_three = stage_three_check
+        else:
+            change = 0
     for i in stage_three:
         print(i)
 
-
+'''
+[7, 6, [1, 3, 5, 8], [1, 3, 5, 8], [3, 5, 8], 9, [3, 5, 8], 4, 2]
+[4, [3, 8, 9], [1, 3, 5, 8, 9], [1, 3, 5, 8], 6, 2, [3, 5, 7, 8], [1, 5, 8], [3, 5, 7, 8]]
+[[1, 3], 2, [1, 3, 5, 8], [1, 3, 4, 5, 8], 7, [1, 3, 4, 5, 8], 6, [1, 5, 8], 9]
+[[3, 9], [3, 9], [3, 7, 9], 2, [3, 4, 5, 8], [3, 4, 5, 8], 1, 6, [4, 5, 7, 8]]
+[8, 5, 2, 9, 1, 6, [4, 7], 3, [4, 7]]
+[6, 1, 4, [3, 5, 8], [3, 5, 8], 7, [2, 5, 8, 9], [2, 5, 8, 9], [5, 8]]
+[2, 7, 6, [1, 3, 4, 5, 8], [3, 4, 5, 8, 9], [1, 3, 4, 5, 8], [3, 4, 5, 8, 9], [5, 8, 9], [3, 4, 5, 8]]
+[[1, 3, 9], [3, 8, 9], [1, 3, 8, 9], 7, [2, 3, 4, 5, 8, 9], [1, 3, 4, 5, 8], [2, 3, 4, 5, 8, 9], [2, 5, 8, 9], 6]
+[5, 4, [3, 8, 9], 6, [2, 3, 8, 9], [3, 8], [2, 3, 8, 9], 7, 1]
+'''
 
 if __name__ == "__main__":
     main()
